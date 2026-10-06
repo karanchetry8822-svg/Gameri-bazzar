@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E5B3A">
+<title>Gaon Bazaar</title>
+<style>
+:root{--bg:#FAF7F2;--card:#fff;--ink:#1B2620;--mute:#5F6B64;--green:#1E5B3A;--red:#C1272D;--line:#E3DDD0;--on:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#121A15;--card:#1B261F;--ink:#EEF3EF;--mute:#9DAEA3;--green:#6FBF8E;--red:#EE6B70;--line:#2B3A30;--on:#0E1510}}
+*{box-sizing:border-box}
+html{scroll-padding-top:60px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Noto Sans Bengali","Noto Sans Devanagari","Segoe UI",sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}
+.top{position:sticky;top:0;z-index:5;background:var(--green);color:var(--on);padding:calc(10px + env(safe-area-inset-top,0)) 14px 10px;border-bottom:4px solid var(--red)}
+.top .r{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.top h1{margin:0;font-size:22px}
+.top small{opacity:.85}
+.wrap{max-width:560px;margin:0 auto;padding:14px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding:11px 16px;font-weight:700}
+.btn.g{background:var(--green);color:var(--on)}
+.btn.o{background:transparent;color:var(--green);border:1.5px solid var(--green)}
+.btn.s{padding:7px 12px;font-size:15px}
+.lang{background:transparent;border:1.5px solid var(--on);color:var(--on);border-radius:8px;padding:5px 10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px}
+.chip{flex:none;border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:6px 14px}
+.chip[aria-pressed=true]{background:var(--green);color:var(--on);border-color:var(--green)}
+input,select{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:10px}
+.box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.item{background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.item.sold{opacity:.6}
+.item img{width:100%;height:210px;object-fit:cover;display:block;background:var(--line)}
+.nopic{height:70px;display:grid;place-items:center;background:var(--line);color:var(--mute);font-size:14px}
+.in{padding:12px 14px}
+.p{font-size:22px;font-weight:800;color:var(--green)}
+.m{color:var(--mute);font-size:14px}
+.tag{background:var(--red);color:#fff;border-radius:6px;padding:1px 8px;font-size:13px;font-weight:700}
+.acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.acts a{text-decoration:none;display:inline-block}
+.msg{text-align:center;color:var(--mute);padding:26px 8px}
+.err{color:var(--red);font-weight:600;margin:0 0 10px}
+#pv{width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-bottom:10px}
+#pic{position:absolute;opacity:0;width:1px;height:1px}
+[hidden]{display:none!important}
+
+/* Cart & checkout */
+.cartbar{display:flex;justify-content:flex-end;margin-bottom:10px}
+.cartbtn{position:relative}
+.cartcount{position:absolute;top:-8px;right:-8px;background:#C1272D;color:#fff;border-radius:99px;min-width:22px;height:22px;padding:1px 5px;text-align:center;font-size:12px;font-weight:800}
+.cartrow{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.cartrow:last-child{border-bottom:0}
+.cartrow .grow{flex:1}
+.qty{display:flex;align-items:center;gap:7px}
+.qty button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:3px 9px}
+.total{font-size:20px;font-weight:800;color:var(--green);margin:12px 0}
+.orderbox{margin-top:12px}
+</style>
+</head>
+<body>
+<header class="top"><div class="r"><div><h1 id="ttl"></h1><small id="sub"></small></div><div style="display:flex;gap:6px"><button class="lang" id="lang"></button></div></div></header>
+<main class="wrap">
+  <div class="cartbar"><button class="btn g cartbtn" id="cartBtn">🛒 Cart <span class="cartcount" id="cartCount">0</span></button></div>
+  <div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn" id="sell"></button><button class="btn o" id="ref"></button></div>
+  <div class="box" id="form" hidden>
+    <p class="err" id="err" hidden></p>
+    <img id="pv" alt="" hidden>
+    <input type="file" id="pic" accept="image/*"><label class="btn o" for="pic" id="picL" style="display:inline-block;margin-bottom:10px"></label>
+    <input id="t" maxlength="80">
+    <input id="pr" inputmode="numeric" maxlength="7">
+    <select id="cat"></select>
+    <input id="vil" maxlength="60">
+    <input id="nm" maxlength="40">
+    <input id="ph" inputmode="numeric" maxlength="10">
+    <div style="display:flex;gap:8px"><button class="btn g" id="save"></button><button class="btn o" id="cancel"></button></div>
+  </div>
+  <div class="chips" id="cats"></div>
+  <div class="chips" id="vils"></div>
+  <div class="box" id="cartBox" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0">🛒 Cart</h2><button class="btn o s" id="closeCart">Close</button>
+    </div>
+    <div id="cartItems"></div>
+    <div class="total" id="cartTotal">Total: ₹0</div>
+    <button class="btn g" id="checkoutBtn" style="width:100%">Proceed to Checkout</button>
+  </div>
+  <div class="box" id="checkoutBox" hidden>
+    <h2 style="margin-top:0">Checkout</h2>
+    <input id="buyerName" placeholder="Your name">
+    <input id="buyerPhone" inputmode="numeric" maxlength="10" placeholder="Mobile number (10 digits)">
+    <input id="buyerAddress" maxlength="150" placeholder="Delivery address">
+    <input id="buyerVillage" maxlength="60" placeholder="Village / City">
+    <input id="buyerPin" inputmode="numeric" maxlength="6" placeholder="PIN code">
+    <select id="paymentMethod"><option value="cod">Cash on Delivery</option><option value="contact">Contact seller first</option></select>
+    <div class="total" id="checkoutTotal">Total: ₹0</div>
+    <div style="display:flex;gap:8px"><button class="btn g" id="placeOrder">Place Order</button><button class="btn o" id="cancelCheckout">Back</button></div>
+    <p class="err" id="orderErr" hidden></p>
+  </div>
+  <div id="list"></div>
+</main>
+<script>
+var SB="https://qzucnlqtttmyfgrytytn.supabase.co",KEY="sb_publishable_8PE_82WbCmJBz075KpYRCg_UihC8Cf9",H={apikey:KEY};
+var CK=["grain","veg","animal","tools","home","service","other"];
+var T={
+hi:{ttl:"गाँव बाज़ार",sub:"अपने गाँव में ख़रीदें और बेचें",sell:"+ बेचें",ref:"ताज़ा करें",all:"सभी",allv:"सभी गाँव",
+ cats:{grain:"अनाज",veg:"सब्ज़ी-फल",animal:"पशु-पक्षी",tools:"औज़ार",home:"घर का सामान",service:"सेवाएँ",other:"अन्य"},
+ pic:"फ़ोटो चुनें",pic2:"फ़ोटो बदलें",t:"क्या बेच रहे हैं? (जैसे: 50 किलो धान)",pr:"क़ीमत ₹ (0 = मुफ़्त)",vil:"आपका गाँव",nm:"आपका नाम",ph:"WhatsApp नंबर (10 अंक)",
+ save:"लिस्टिंग डालें",cancel:"रद्द करें",cart:"कार्ट",close:"बंद करें",checkout:"चेकआउट",place:"ऑर्डर करें",free:"मुफ़्त",sold:"बिक गया",wa:"WhatsApp करें",add:"कार्ट में डालें",mk:"बिक गया",unmk:"फिर दिखाएँ",del:"हटाएँ",
+ empty:"अभी कुछ नहीं है। पहली लिस्टिंग आप डालें।",load:"लोड हो रहा है…",nonet:"इंटरनेट की दिक्कत है। फिर कोशिश करें।",
+ e_t:"चीज़ का नाम लिखें",e_v:"गाँव का नाम लिखें",e_ph:"10 अंक का सही नंबर डालें",e_pic:"फ़ोटो नहीं चढ़ी, फिर कोशिश करें",ask:"क्या आप इसे हटाना चाहते हैं?",msg:"नमस्ते, आपकी लिस्टिंग देखी: "},
+as:{ttl:"গাঁও বজাৰ",sub:"নিজৰ গাঁৱতে কিনক আৰু বিক্ৰী কৰক",sell:"+ বিক্ৰী কৰক",ref:"নতুন কৰক",all:"সকলো",allv:"সকলো গাঁও",
+ cats:{grain:"শস্য",veg:"শাক-পাচলি-ফল",animal:"পশু-চৰাই",tools:"সঁজুলি",home:"ঘৰৰ সামগ্ৰী",service:"সেৱা",other:"অন্যান্য"},
+ pic:"ফটো বাছক",pic2:"ফটো সলনি কৰক",t:"কি বিক্ৰী কৰিছে? (যেনে: ৫০ কিলো ধান)",pr:"দাম ₹ (0 = বিনামূলীয়া)",vil:"আপোনাৰ গাঁও",nm:"আপোনাৰ নাম",ph:"WhatsApp নম্বৰ (১০ আখৰ)",
+ save:"লিস্টিং দিয়ক",cancel:"বাতিল",cart:"কাৰ্ট",close:"বন্ধ",checkout:"চেকআউট",place:"অৰ্ডাৰ কৰক",free:"বিনামূলীয়া",sold:"বিক্ৰী হ'ল",wa:"WhatsApp কৰক",add:"কাৰ্টত দিয়ক",mk:"বিক্ৰী হ'ল",unmk:"আকৌ দেখুৱাওক",del:"আঁতৰাওক",
+ empty:"এতিয়া একো নাই। প্ৰথম লিস্টিং আপুনি দিয়ক।",load:"লোড হৈ আছে…",nonet:"ইণ্টাৰনেটৰ সমস্যা। আকৌ চেষ্টা কৰক।",
+ e_t:"বস্তুটোৰ নাম লিখক",e_v:"গাঁৱৰ নাম লিখক",e_ph:"১০ আখৰৰ শুদ্ধ নম্বৰ দিয়ক",e_pic:"ফটো আপলোড নহ'ল, আকৌ চেষ্টা কৰক",ask:"আপুনি ইয়াক আঁতৰাব বিচাৰেনে?",msg:"নমস্কাৰ, আপোনাৰ লিস্টিং দেখিলোঁ: "},
+en:{ttl:"Gaon Bazaar",sub:"Buy and sell in your own village",sell:"+ Sell",ref:"Refresh",all:"All",allv:"All villages",
+ cats:{grain:"Grains",veg:"Vegetables & fruit",animal:"Animals & birds",tools:"Tools",home:"Household",service:"Services",other:"Other"},
+ pic:"Choose photo",pic2:"Change photo",t:"What are you selling? (e.g. 50 kg paddy)",pr:"Price in ₹ (0 = free)",vil:"Your village",nm:"Your name",ph:"WhatsApp number (10 digits)",
+ save:"Post listing",cancel:"Cancel",cart:"Cart",close:"Close",checkout:"Checkout",place:"Place Order",free:"Free",sold:"Sold",wa:"Message on WhatsApp",add:"Add to Cart",mk:"Mark sold",unmk:"Show again",del:"Delete",
+ empty:"Nothing here yet. Be the first to post a listing.",load:"Loading…",nonet:"Network problem. Please try again.",
+ e_t:"Enter what you are selling",e_v:"Enter your village name",e_ph:"Enter a valid 10-digit number",e_pic:"Photo upload failed, please try again",ask:"Delete this listing?",msg:"Hello, I saw your listing: "}
+};
+var mem={};
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){if(v===undefined)return mem[k]||null;mem[k]=v}}
+var L=ls("gb_lang")||"hi";if(!T[L])L="hi";var D=[],cat="all",vil="all",img=null,busy=false;
+var token=ls("gb_tok");if(!token){token=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());ls("gb_tok",token)}
+var mine={};try{mine=JSON.parse(ls("gb_mine")||"{}")}catch(e){}
+function $(i){return document.getElementById(i)}
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML}
+function tr(){return T[L]}
+function labels(){
+ var t=tr();document.documentElement.lang=L;
+ $("ttl").textContent=t.ttl;$("sub").textContent=t.sub;$("sell").textContent=t.sell;$("ref").textContent=t.ref;
+ $("lang").textContent=L==="hi"?"অসমীয়া":L==="as"?"English":"हिन्दी";
+ $("picL").textContent=img?t.pic2:t.pic;$("t").placeholder=t.t;$("pr").placeholder=t.pr;$("vil").placeholder=t.vil;$("nm").placeholder=t.nm;$("ph").placeholder=t.ph;
+ $("save").textContent=t.save;$("cancel").textContent=t.cancel;
+ var v=$("cat").value;$("cat").innerHTML=CK.map(function(k){return '<option value="'+k+'">'+t.cats[k]+'</option>'}).join("");if(v)$("cat").value=v;
+}
+function render(){
+ var t=tr(),vs=[];D.forEach(function(x){if(vs.indexOf(x.village)<0)vs.push(x.village)});
+ $("cats").innerHTML=["all"].concat(CK).map(function(k){return '<button class="chip" aria-pressed="'+(k===cat)+'" data-c="'+k+'">'+(k==="all"?t.all:t.cats[k])+'</button>'}).join("");
+ $("vils").innerHTML=vs.length>1?["all"].concat(vs).map(function(v){return '<button class="chip" aria-pressed="'+(v===vil)+'" data-v="'+esc(v)+'">'+(v==="all"?t.allv:esc(v))+'</button>'}).join(""):"";
+ var R=D.filter(function(x){return(cat==="all"||x.category===cat)&&(vil==="all"||x.village===vil)});
+ $("list").innerHTML=R.length?R.map(card).join(""):'<div class="msg">'+t.empty+'</div>';
+}
+function card(x){
+ var t=tr(),my=mine[x.id],ok=x.photo_url&&x.photo_url.indexOf(SB+"/storage/")===0;
+ var wa="https://wa.me/91"+x.phone+"?text="+encodeURIComponent(t.msg+x.title);
+ return '<article class="item'+(x.sold?' sold':'')+'">'+(ok?'<img loading="lazy" alt="'+esc(x.title)+'" src="'+esc(x.photo_url)+'">':'')
+ +'<div class="in"><div><strong>'+esc(x.title)+'</strong> '+(x.sold?'<span class="tag">'+t.sold+'</span>':'')+'</div>'
+ +'<div class="p">'+(x.price>0?'₹'+x.price:t.free)+'</div>'
+ +'<div class="m">'+esc(x.village)+(x.seller_name?' · '+esc(x.seller_name):'')+' · '+(t.cats[x.category]||'')+'</div>'
+ +'<div class="acts">'+(!x.sold&&!my?'<a class="btn g s" target="_blank" rel="noopener" href="'+wa+'">'+t.wa+'</a>':'')
+ +(my?'<button class="btn o s" data-s="'+x.id+'">'+(x.sold?t.unmk:t.mk)+'</button><button class="btn o s" data-d="'+x.id+'">'+t.del+'</button>':'')
+ +'</div></div></article>';
+}
+function load(){
+ $("list").innerHTML='<div class="msg">'+tr().load+'</div>';
+ fetch(SB+"/rest/v1/listings?select=id,title,price,category,village,seller_name,phone,photo_url,sold&order=created_at.desc&limit=100",{headers:H})
+ .then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){D=d;render()})
+ .catch(function(){$("list").innerHTML='<div class="msg">'+tr().nonet+'</div>'});
+}
+function rpc(fn,body){return fetch(SB+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){if(!r.ok)throw 0;return r.status===204?null:r.json()})}
+function showErr(m){$("err").textContent=m;$("err").hidden=!m}
+function resetForm(){img=null;$("pv").hidden=true;$("pic").value="";["t","pr","nm"].forEach(function(i){$(i).value=""});showErr("");labels()}
+$("lang").onclick=function(){L=L==="hi"?"as":L==="as"?"en":"hi";ls("gb_lang",L);labels();render()};
+$("ref").onclick=load;
+$("sell").onclick=function(){$("form").hidden=false;$("vil").value=ls("gb_vil")||"Gameri Gadharia Pathar";$("nm").value=ls("gb_nm")||"";$("ph").value=ls("gb_ph")||"";$("t").focus()};
+$("cancel").onclick=function(){$("form").hidden=true;resetForm()};
+$("cats").onclick=function(e){var c=e.target.getAttribute("data-c");if(c){cat=c;render()}};
+$("vils").onclick=function(e){var v=e.target.getAttribute("data-v");if(v){vil=v;render()}};
+$("pic").onchange=function(){
+ var f=this.files&&this.files[0];if(!f)return;var u=URL.createObjectURL(f),im=new Image();
+ im.onload=function(){var k=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
+  c.toBlob(function(b){img=b;$("pv").src=URL.createObjectURL(b);$("pv").hidden=false;labels()},"image/jpeg",0.72)};
+ im.onerror=function(){showErr(tr().e_pic)};im.src=u;
+};
+$("save").onclick=function(){
+ if(busy)return;var t=tr(),title=$("t").value.trim(),v=$("vil").value.trim(),ph=$("ph").value.replace(/\D/g,"");
+ if(!title)return showErr(t.e_t),$("t").focus();
+ if(!v)return showErr(t.e_v),$("vil").focus();
+ if(ph.length!==10)return showErr(t.e_ph),$("ph").focus();
+ busy=true;$("save").disabled=true;showErr("");
+ var name=token.slice(0,8)+"-"+Date.now()+".jpg",up=img?fetch(SB+"/storage/v1/object/photos/"+name,{method:"POST",headers:{apikey:KEY,"Content-Type":"image/jpeg"},body:img}).then(function(r){if(!r.ok)throw"pic";return SB+"/storage/v1/object/public/photos/"+name}):Promise.resolve(null);
+ up.then(function(url){return rpc("add_listing",{p_title:title,p_price:parseInt($("pr").value,10)||0,p_category:$("cat").value,p_village:v,p_seller:$("nm").value.trim()||null,p_phone:ph,p_photo:url,p_token:token})})
+ .then(function(id){if(id){mine[id]=1;ls("gb_mine",JSON.stringify(mine))}ls("gb_vil",v);ls("gb_nm",$("nm").value.trim());ls("gb_ph",ph);$("form").hidden=true;resetForm();load()})
+ .catch(function(e){showErr(e==="pic"?t.e_pic:t.nonet)})
+ .then(function(){busy=false;$("save").disabled=false});
+};
+$("list").onclick=function(e){
+ var s=e.target.getAttribute("data-s"),d=e.target.getAttribute("data-d");
+ if(s){var x=D.filter(function(i){return i.id===s})[0];rpc("set_sold",{p_id:s,p_token:token,p_sold:!x.sold}).then(load).catch(function(){alert(tr().nonet)})}
+ else if(d){if(confirm(tr().ask))rpc("delete_listing",{p_id:d,p_token:token}).then(load).catch(function(){alert(tr().nonet)})}
+};
+
+var cart=[];
+try{cart=JSON.parse(ls("gb_cart")||"[]")}catch(e){cart=[]}
+function saveCart(){ls("gb_cart",JSON.stringify(cart));renderCart()}
+function cartQty(id){var c=cart.filter(function(i){return i.id===id})[0];return c?c.qty:0}
+function addCart(id){
+  var x=D.filter(function(i){return i.id===id})[0]; if(!x||x.sold)return;
+  var c=cart.filter(function(i){return i.id===id})[0];
+  if(c)c.qty++;else cart.push({id:x.id,qty:1});
+  saveCart(); $("cartBox").hidden=false; $("checkoutBox").hidden=true;
+}
+function changeQty(id,delta){
+  var c=cart.filter(function(i){return i.id===id})[0]; if(!c)return;
+  c.qty+=delta;if(c.qty<=0)cart=cart.filter(function(i){return i.id!==id});
+  saveCart();
+}
+function renderCart(){
+  var count=cart.reduce(function(a,c){return a+c.qty},0);
+  $("cartCount").textContent=count;
+  var total=0,html="";
+  cart.forEach(function(c){
+    var x=D.filter(function(i){return i.id===c.id})[0];if(!x)return;
+    total+=(Number(x.price)||0)*c.qty;
+    html+='<div class="cartrow"><div class="grow"><strong>'+esc(x.title)+'</strong><div class="m">₹'+(Number(x.price)||0)+' × '+c.qty+'</div></div><div class="qty"><button data-minus="'+x.id+'">−</button><b>'+c.qty+'</b><button data-plus="'+x.id+'">+</button></div></div>';
+  });
+  $("cartItems").innerHTML=html||'<div class="msg">Your cart is empty.</div>';
+  $("cartTotal").textContent="Total: ₹"+total;
+  $("checkoutTotal").textContent="Total: ₹"+total;
+  $("checkoutBtn").disabled=!cart.length;
+}
+function cartTotalValue(){
+  return cart.reduce(function(sum,c){var x=D.filter(function(i){return i.id===c.id})[0];return sum+(x?(Number(x.price)||0)*c.qty:0)},0);
+}
+$("cartBtn").onclick=function(){$("cartBox").hidden=false;$("checkoutBox").hidden=true;renderCart();$("cartBox").scrollIntoView({behavior:"smooth"})};
+$("closeCart").onclick=function(){$("cartBox").hidden=true};
+$("checkoutBtn").onclick=function(){
+  if(!cart.length)return;
+  $("checkoutBox").hidden=false;$("cartBox").hidden=true;
+  $("buyerName").value=ls("gb_buyer_name")||"";
+  $("buyerPhone").value=ls("gb_buyer_ph")||"";
+  $("buyerAddress").value=ls("gb_buyer_addr")||"";
+  $("buyerVillage").value=ls("gb_buyer_vil")||"";
+  $("buyerPin").value=ls("gb_buyer_pin")||"";
+  $("checkoutTotal").textContent="Total: ₹"+cartTotalValue();
+  $("checkoutBox").scrollIntoView({behavior:"smooth"});
+};
+$("cancelCheckout").onclick=function(){$("checkoutBox").hidden=true;$("cartBox").hidden=false};
+$("cartItems").onclick=function(e){
+  var id=e.target.getAttribute("data-plus")||e.target.getAttribute("data-minus");
+  if(id)changeQty(id,e.target.getAttribute("data-plus")?1:-1);
+};
+$("placeOrder").onclick=function(){
+  var name=$("buyerName").value.trim(),ph=$("buyerPhone").value.replace(/\D/g,""),addr=$("buyerAddress").value.trim(),v=$("buyerVillage").value.trim(),pin=$("buyerPin").value.replace(/\D/g,"");
+  if(!name||ph.length!==10||!addr||!v||pin.length!==6){$("orderErr").textContent="Please fill all checkout details correctly."; $("orderErr").hidden=false;return}
+  $("orderErr").hidden=true;$("placeOrder").disabled=true;
+  var payload={p_buyer_name:name,p_buyer_phone:ph,p_address:addr,p_village:v,p_pin:pin,p_payment:$("paymentMethod").value,p_items:cart.map(function(c){return {id:c.id,qty:c.qty}}),p_total:cartTotalValue(),p_token:token};
+  rpc("create_order",payload).then(function(){
+    ls("gb_buyer_name",name);ls("gb_buyer_ph",ph);ls("gb_buyer_addr",addr);ls("gb_buyer_vil",v);ls("gb_buyer_pin",pin);
+    cart=[];saveCart();$("checkoutBox").hidden=true;
+    alert("Order placed successfully!");
+    load();
+  }).catch(function(){alert("Order could not be placed. Supabase order table/RPC is not configured yet.")}).then(function(){$("placeOrder").disabled=false});
+};
+
+labels();render();renderCart();load();
+</script>
+</body>
+</html>
