@@ -81,20 +81,26 @@ as:{ttl:"গাঁও বজাৰ",sub:"নিজৰ গাঁৱতে কি�
  pic:"ফটো বাছক",pic2:"ফটো সলনি কৰক",t:"কি বিক্ৰী কৰিছে? (যেনে: ৫০ কিলো ধান)",pr:"দাম ₹ (0 = বিনামূলীয়া)",vil:"আপোনাৰ গাঁও",nm:"আপোনাৰ নাম",ph:"WhatsApp নম্বৰ (১০ আখৰ)",
  save:"লিস্টিং দিয়ক",cancel:"বাতিল",free:"বিনামূলীয়া",sold:"বিক্ৰী হ'ল",wa:"WhatsApp কৰক",mk:"বিক্ৰী হ'ল",unmk:"আকৌ দেখুৱাওক",del:"আঁতৰাওক",
  empty:"এতিয়া একো নাই। প্ৰথম লিস্টিং আপুনি দিয়ক।",load:"লোড হৈ আছে…",nonet:"ইণ্টাৰনেটৰ সমস্যা। আকৌ চেষ্টা কৰক।",
- e_t:"বস্তুটোৰ নাম লিখক",e_v:"গাঁৱৰ নাম লিখক",e_ph:"১০ আখৰৰ শুদ্ধ নম্বৰ দিয়ক",e_pic:"ফটো আপলোড নহ'ল, আকৌ চেষ্টা কৰক",ask:"আপুনি ইয়াক আঁতৰাব বিচাৰেনে?",msg:"নমস্কাৰ, আপোনাৰ লিস্টিং দেখিলোঁ: "}
+ e_t:"বস্তুটোৰ নাম লিখক",e_v:"গাঁৱৰ নাম লিখক",e_ph:"১০ আখৰৰ শুদ্ধ নম্বৰ দিয়ক",e_pic:"ফটো আপলোড নহ'ল, আকৌ চেষ্টা কৰক",ask:"আপুনি ইয়াক আঁতৰাব বিচাৰেনে?",msg:"নমস্কাৰ, আপোনাৰ লিস্টিং দেখিলোঁ: "},
+en:{ttl:"Gaon Bazaar",sub:"Buy and sell in your own village",sell:"+ Sell",ref:"Refresh",all:"All",allv:"All villages",
+ cats:{grain:"Grains",veg:"Vegetables & fruit",animal:"Animals & birds",tools:"Tools",home:"Household",service:"Services",other:"Other"},
+ pic:"Choose photo",pic2:"Change photo",t:"What are you selling? (e.g. 50 kg paddy)",pr:"Price in ₹ (0 = free)",vil:"Your village",nm:"Your name",ph:"WhatsApp number (10 digits)",
+ save:"Post listing",cancel:"Cancel",free:"Free",sold:"Sold",wa:"Message on WhatsApp",mk:"Mark sold",unmk:"Show again",del:"Delete",
+ empty:"Nothing here yet. Be the first to post a listing.",load:"Loading…",nonet:"Network problem. Please try again.",
+ e_t:"Enter what you are selling",e_v:"Enter your village name",e_ph:"Enter a valid 10-digit number",e_pic:"Photo upload failed, please try again",ask:"Delete this listing?",msg:"Hello, I saw your listing: "}
 };
 var mem={};
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){if(v===undefined)return mem[k]||null;mem[k]=v}}
-var L=ls("gb_lang")||"hi",D=[],cat="all",vil="all",img=null,busy=false;
+var L=ls("gb_lang")||"hi";if(!T[L])L="hi";var D=[],cat="all",vil="all",img=null,busy=false;
 var token=ls("gb_tok");if(!token){token=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());ls("gb_tok",token)}
 var mine={};try{mine=JSON.parse(ls("gb_mine")||"{}")}catch(e){}
 function $(i){return document.getElementById(i)}
 function esc(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML}
 function tr(){return T[L]}
 function labels(){
- var t=tr();document.documentElement.lang=L==="as"?"as":"hi";
+ var t=tr();document.documentElement.lang=L;
  $("ttl").textContent=t.ttl;$("sub").textContent=t.sub;$("sell").textContent=t.sell;$("ref").textContent=t.ref;
- $("lang").textContent=L==="hi"?"অসমীয়া":"हिन्दी";
+ $("lang").textContent=L==="hi"?"অসমীয়া":L==="as"?"English":"हिन्दी";
  $("picL").textContent=img?t.pic2:t.pic;$("t").placeholder=t.t;$("pr").placeholder=t.pr;$("vil").placeholder=t.vil;$("nm").placeholder=t.nm;$("ph").placeholder=t.ph;
  $("save").textContent=t.save;$("cancel").textContent=t.cancel;
  var v=$("cat").value;$("cat").innerHTML=CK.map(function(k){return '<option value="'+k+'">'+t.cats[k]+'</option>'}).join("");if(v)$("cat").value=v;
@@ -126,7 +132,7 @@ function load(){
 function rpc(fn,body){return fetch(SB+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){if(!r.ok)throw 0;return r.status===204?null:r.json()})}
 function showErr(m){$("err").textContent=m;$("err").hidden=!m}
 function resetForm(){img=null;$("pv").hidden=true;$("pic").value="";["t","pr","nm"].forEach(function(i){$(i).value=""});showErr("");labels()}
-$("lang").onclick=function(){L=L==="hi"?"as":"hi";ls("gb_lang",L);labels();render()};
+$("lang").onclick=function(){L=L==="hi"?"as":L==="as"?"en":"hi";ls("gb_lang",L);labels();render()};
 $("ref").onclick=load;
 $("sell").onclick=function(){$("form").hidden=false;$("vil").value=ls("gb_vil")||"Gameri Gadharia Pathar";$("nm").value=ls("gb_nm")||"";$("ph").value=ls("gb_ph")||"";$("t").focus()};
 $("cancel").onclick=function(){$("form").hidden=true;resetForm()};
